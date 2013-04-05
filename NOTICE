@@ -1,0 +1,12 @@
+Cognon neuron simulator implementation in Python
+Copyright 2013 Pau Haro Negre
+
+This software is based on Cognon neuron simulator C++ implementation code by
+Carl Staelin, published under Apache License, Version 2.0. The original source
+code is available from
+  https://code.google.com/p/cognon/source
+
+Copyright 2009-2011 Carl Staelin. All Rights Reserved.
+Copyright 2011 Google Inc. All Rights Reserved.
+
+Author: carl.staelin@gmail.com (Carl Staelin)
