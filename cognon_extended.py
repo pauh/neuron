@@ -1,5 +1,3 @@
-#!/usr/bin/env python2.7
-
 # Copyright 2013 Pau Haro Negre
 # based on C++ code by Carl Staelin Copyright 2009-2011
 # 
@@ -22,11 +20,6 @@
 import numpy as np
 
 
-### CONSTANTS ###
-
-
-
-### CLASSES ###
 class Word(object):
     """A Word contains a list of those input synapses that fired for the most
     recent given excitation pattern.
@@ -39,8 +32,11 @@ class Word(object):
         """Inits Word class.
 
         Args:
-            fired_syn: List of input synapses that fired.
+            fired_syn: List of input synapses that fired. Can only contain
+            positive values.
         """
+        if len(fired_syn) > 0 and sorted(fired_syn)[0] < 0:
+            raise ValueError('offset values have to be positive')
         self.offset = set(fired_syn)
 
 
@@ -59,7 +55,10 @@ class Neuron(object):
         """Inits Neuron class.
 
         Args:
-            fired_syn: List of input synapses that fired.
+            S0: Number of synapses.
+            H: Number of synapses needed to fire a neuron.
+            G: Ratio of strong synapse strength to weak synapse strength,
+                binary approximation.
         """
         self.S0 = S0
         self.H = H
@@ -106,6 +105,7 @@ class Neuron(object):
        """
         if not self.training:
             print "[WARN] train(w) was called when not in training mode."
+            return False
         
         if not self.expose(w): return False
     
@@ -120,6 +120,7 @@ class Neuron(object):
        """
         self.training = True
 
+
     def end_training(self):
         """Set the neuron in recognition mode.
     
@@ -127,22 +128,4 @@ class Neuron(object):
        to H*G.
        """
         self.training = False
-
-
-### MAIN ###
-def main():
-    print ":: Cognon Basic model simulation ::"
-
-# Create a neuron model
-n = Neuron()
-
-# Create 3 training words
-wA = Word([1,6,9,14])
-wB = Word([3,4,9,13])
-wD = Word([2,6,12,14])
-wE = Word([3,7,9,13])
-wF = Word([1,4,9,14])
-
-if __name__ == '__main__':
-    main()
 
