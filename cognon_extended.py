@@ -40,6 +40,23 @@ class Word(object):
         self.offset = set(fired_syn)
 
 
+class WordSet(object):
+    """An array of Words.
+
+    Wordset is simply an array of Word instances, which may also store
+    information regarding the delay slot learned for the word during training.
+
+    Attributes:
+        words: Array of Word instances.
+        delays: Delay slots learned for each word during training.
+    """
+
+    def __init__(self):
+        """Inits WordSet class."""
+        self.words = []
+        self.delays = []
+
+
 class Neuron(object):
     """Models a CB neuron.
 
