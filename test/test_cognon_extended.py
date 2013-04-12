@@ -19,6 +19,7 @@
 
 from cognon_extended import Neuron
 from cognon_extended import Word
+from cognon_extended import WordSet
 
 from nose.tools import assert_false
 from nose.tools import assert_in
@@ -43,6 +44,14 @@ class TestWord:
         assert_in(1, w.offset)
         assert_in(3, w.offset)
         assert_in(8, w.offset)
+
+
+class TestWordSet:
+
+    def test_empty(self):
+        ws = WordSet()
+        eq_(len(ws.words), 0)
+        eq_(len(ws.delays), 0)
 
 
 class TestNeuron:
