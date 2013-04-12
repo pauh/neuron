@@ -78,7 +78,7 @@ class TestNeuron:
         n.start_training()
         assert_true(n.train(wA))
         assert_true(n.train(wB))
-        n.end_training()
+        n.finish_training()
 
         wD = Word([2,6,12,14])
         wE = Word([3,7,9,13])

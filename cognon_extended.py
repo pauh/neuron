@@ -138,7 +138,7 @@ class Neuron(object):
         self.training = True
 
 
-    def end_training(self):
+    def finish_training(self):
         """Set the neuron in recognition mode.
     
        Once the training is complete, the neuron's threshold value H is set
