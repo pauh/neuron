@@ -51,10 +51,17 @@ class WordSet(object):
         delays: Delay slots learned for each word during training.
     """
 
-    def __init__(self):
-        """Inits WordSet class."""
+    def __init__(self, num_words=0):
+        """Inits WordSet class.
+       
+       Args:
+           num_words: Number of Words to initialize the WordSet with.
+       """
         self.words = []
         self.delays = []
+
+        for i in range(num_words):
+            self.words.append(Word())
 
 
 class Neuron(object):
