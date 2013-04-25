@@ -32,7 +32,7 @@ from nose.tools import raises
 class TestSynapse:
 
     @raises(TypeError)
-    def construct_requires_args(self):
+    def test_construct_requires_args(self):
         s = Synapse()
 
     def test_named_attributes(self):
