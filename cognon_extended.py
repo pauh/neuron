@@ -22,13 +22,21 @@ from collections import namedtuple
 
 
 class Synapse(namedtuple('Synapse', ['offset', 'delay'])):
-    """A Synapse represents the connection between two neurons."""
+    """A Synapse represents a connection between the neuron's input dendrites
+    and the output axons of other neurons.
+
+    Attributes:
+        offset: Identifies a synapse of the neuron.
+        delay: Represents the time the signal takes to traverse the axon to
+        reach the synapse. Takes a value in range(D1).
+    """
     pass
 
 
 class Word(object):
-    """A Word contains a list of those input synapses that fired for the most
-    recent given excitation pattern.
+    """An input Word represents the input signals to the neuron for a time
+    period. A Word contains a list of those input synapses that fired for the
+    most recent given excitation pattern.
 
     Attributes:
         synapses: A set of pairs containing the syanpses that fired and the
