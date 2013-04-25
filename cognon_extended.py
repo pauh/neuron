@@ -98,13 +98,13 @@ class Neuron(object):
 
 
     def expose(self, w):
-        """Models how the neuron reacts to excitation patterns, and how it computes
-       whether or not to fire.
+        """Models how the neuron reacts to excitation patterns, and how it
+        computes whether or not to fire.
 
-       Expose computes the weighted sum of the input word, and the neuron fires if
-       that sum meets or exceeds a threshold. The weighted sum is the sum of the
-       S0 element-by-element products f the most recent neron vector, the current
-       word, and the neuron frozen Boolean vector.
+       Expose computes the weighted sum of the input word, and the neuron fires
+       if that sum meets or exceeds a threshold. The weighted sum is the sum of
+       the S0 element-by-element products of the most recent neuron vector, the
+       current word, and the neuron frozen Boolean vector.
 
        Args:
            w: A Word to present to the neuron.
@@ -123,9 +123,9 @@ class Neuron(object):
     def train(self, w):
         """Trains a neuron with an input word.
     
-       To train a neuron, "train" is called for each word to be recognized. If the
-       neuron fires for that word then all synapses that contributed to that
-       firing have their strengths irreversibly increased to G.
+       To train a neuron, "train" is called for each word to be recognized. If
+       the neuron fires for that word then all synapses that contributed to
+       that firing have their strengths irreversibly increased to G.
 
        Args:
            w: A Word to train the neuron with.
