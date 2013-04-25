@@ -44,7 +44,7 @@ class Word(object):
         """
         if len(fired_syn) > 0 and sorted(fired_syn)[0][0] < 0:
             raise ValueError('synapse offset values have to be positive')
-        self.synapses = set(Synapse(*s) for s in fired_syn)
+        self.synapses = [Synapse(*s) for s in fired_syn]
 
 
 class WordSet(object):
@@ -114,7 +114,8 @@ class Neuron(object):
            A Boolean indicating whether the neuron will fire or not.
        """
         # Compute the weighted sum of the firing inputs
-        s = self.strength[list(offset for offset, delay in w.synapses)].sum()
+        offset = [s.offset for s in w.synapses]
+        s = self.strength[offset].sum()
         if self.training:
             return s >= self.H
         else:
@@ -141,7 +142,8 @@ class Neuron(object):
         if not self.expose(w): return False
     
         # Set the srength for participating synapses to G
-        self.strength[list(offset for offset, delay in w.synapses)] = self.G
+        offset = [s.offset for s in w.synapses]
+        self.strength[offset] = self.G
     
         return True
 
