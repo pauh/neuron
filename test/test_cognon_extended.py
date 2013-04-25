@@ -18,6 +18,7 @@
 #
 
 from cognon_extended import Neuron
+from cognon_extended import Synapse
 from cognon_extended import Word
 from cognon_extended import WordSet
 
@@ -28,22 +29,39 @@ from nose.tools import eq_
 from nose.tools import raises
 
 
+class TestSynapse:
+
+    @raises(TypeError)
+    def construct_requires_args(self):
+        s = Synapse()
+
+    def test_named_attributes(self):
+        s = Synapse(1, 0)
+        eq_(s.offset, 1)
+        eq_(s.delay, 0)
+
+
 class TestWord:
 
     def test_empty(self):
         w = Word()
-        eq_(len(w.offset), 0)
+        eq_(len(w.synapses), 0)
 
     @raises(ValueError)
-    def test_negative_offset(self):
-        w = Word([-1])
+    def test_negative_synapse_offset(self):
+        w = Word([(-1, 0)])
 
     def test_fire_1_3_8(self):
-        w = Word([1,3,8])
-        eq_(len(w.offset), 3)
-        assert_in(1, w.offset)
-        assert_in(3, w.offset)
-        assert_in(8, w.offset)
+        w = Word([(1,0),(3,0),(8,0)])
+        eq_(len(w.synapses), 3)
+        assert_in((1,0), w.synapses)
+        assert_in((3,0), w.synapses)
+        assert_in((8,0), w.synapses)
+    
+    def test_delay_0(self):
+        w = Word([(1,0),(3,0),(8,0)])
+        for offset, delay in w.synapses:
+            eq_(delay, 0)
 
 
 class TestWordSet:
@@ -67,34 +85,34 @@ class TestNeuron:
     def test_expose_not_training(self):
         n = Neuron(S0 = 16, H = 4.0, G = 2.0)
 
-        w1 = Word([1,6,9])
+        w1 = Word([(1,0), (6,0), (9,0)])
         assert_false(n.expose(w1))
 
-        w2 = Word([1,3,4,5,6,8,9,14])
+        w2 = Word([(1,0), (3,0), (4,0), (5,0), (6,0), (8,0), (9,0), (14,0)])
         assert_true(n.expose(w2))
 
     @raises(IndexError)
     def test_expose_index_error(self):
         n = Neuron(S0 = 16)
-        w = Word([16])
+        w = Word([(16,0)])
         n.expose(w)
 
     def test_train(self):
         n = Neuron(16, 4.0, 2.0)
-        wA = Word([1,6,9,14])
-        wB = Word([3,4,9,13])
+        wA = Word([(1,0), (6,0), (9,0), (14,0)])
+        wB = Word([(3,0), (4,0), (9,0), (13,0)])
 
         n.start_training()
         assert_true(n.train(wA))
         assert_true(n.train(wB))
         n.finish_training()
 
-        wD = Word([2,6,12,14])
-        wE = Word([3,7,9,13])
+        wD = Word([(2,0), (6,0), (12,0), (14,0)])
+        wE = Word([(3,0), (7,0), (9,0), (13,0)])
         assert_false(n.expose(wD))
         assert_false(n.expose(wE))
 
-        wF = Word([1,4,9,14])
+        wF = Word([(1,0), (4,0), (9,0), (14,0)])
         assert_true(n.expose(wF))
 
     def test_train_not_training(self):

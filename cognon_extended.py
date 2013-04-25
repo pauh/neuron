@@ -18,6 +18,12 @@
 #
 
 import numpy as np
+from collections import namedtuple
+
+
+class Synapse(namedtuple('Synapse', ['offset', 'delay'])):
+    """A Synapse represents the connection between two neurons."""
+    pass
 
 
 class Word(object):
@@ -25,7 +31,7 @@ class Word(object):
     recent given excitation pattern.
 
     Attributes:
-        offset: A set containing the syanpses that fired.
+        synapses: A set containing the syanpses that fired.
     """
     
     def __init__(self, fired_syn=[]):
@@ -35,9 +41,9 @@ class Word(object):
             fired_syn: List of input synapses that fired. Can only contain
             positive values.
         """
-        if len(fired_syn) > 0 and sorted(fired_syn)[0] < 0:
-            raise ValueError('offset values have to be positive')
-        self.offset = set(fired_syn)
+        if len(fired_syn) > 0 and sorted(fired_syn)[0][0] < 0:
+            raise ValueError('synapses values have to be positive')
+        self.synapses = set(Synapse(*s) for s in fired_syn)
 
 
 class WordSet(object):
@@ -107,7 +113,7 @@ class Neuron(object):
            A Boolean indicating whether the neuron will fire or not.
        """
         # Compute the weighted sum of the firing inputs
-        s = self.strength[list(w.offset)].sum()
+        s = self.strength[list(offset for offset, delay in w.synapses)].sum()
         if self.training:
             return s >= self.H
         else:
@@ -134,7 +140,7 @@ class Neuron(object):
         if not self.expose(w): return False
     
         # Set the srength for participating synapses to G
-        self.strength[list(w.offset)] = self.G
+        self.strength[list(offset for offset, delay in w.synapses)] = self.G
     
         return True
 
