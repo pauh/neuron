@@ -31,18 +31,19 @@ class Word(object):
     recent given excitation pattern.
 
     Attributes:
-        synapses: A set containing the syanpses that fired.
+        synapses: A set of pairs containing the syanpses that fired and the
+        associated delay.
     """
     
     def __init__(self, fired_syn=[]):
         """Inits Word class.
 
         Args:
-            fired_syn: List of input synapses that fired. Can only contain
-            positive values.
+            fired_syn: List of pairs of input synapses that fired and
+            associated delays. Can only contain positive synapse offset values.
         """
         if len(fired_syn) > 0 and sorted(fired_syn)[0][0] < 0:
-            raise ValueError('synapses values have to be positive')
+            raise ValueError('synapse offset values have to be positive')
         self.synapses = set(Synapse(*s) for s in fired_syn)
 
 
