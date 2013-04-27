@@ -26,6 +26,7 @@ from nose.tools import assert_false
 from nose.tools import assert_in
 from nose.tools import assert_true
 from nose.tools import eq_
+from nose.tools import ok_
 from nose.tools import raises
 
 
@@ -66,10 +67,25 @@ class TestWord:
 
 class TestWordSet:
 
-    def test_empty(self):
-        ws = WordSet()
-        eq_(len(ws.words), 0)
-        eq_(len(ws.delays), 0)
+    def test_small(self):
+        num_words = 5
+        word_length = 16
+        num_delays = 4
+        num_active = 4
+        
+        ws = WordSet(num_words, word_length, num_delays, num_active)
+        
+        eq_(len(ws.words), num_words)
+        eq_(len(ws.delays), num_words)
+
+        for i in range(num_words):
+            word = ws.words[i]
+            eq_(len(word.synapses), num_active)
+            for synapse in word.synapses:
+                ok_(synapse.offset >= 0)
+                ok_(synapse.offset < word_length)
+                ok_(synapse.delay >= 0)
+                ok_(synapse.delay < num_delays)
 
 
 class TestNeuron:
