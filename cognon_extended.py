@@ -82,7 +82,8 @@ class WordSet(object):
 
         for i in range(num_words):
             active_syn = random.sample(synapses, num_active)
-            self.words.append(Word())
+            active_delays = np.random.randint(num_delays, size=num_active)
+            self.words.append(Word(zip(active_syn, active_delays)))
 
 
 class Neuron(object):
