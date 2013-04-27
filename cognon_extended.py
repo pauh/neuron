@@ -17,8 +17,9 @@
 # limitations under the License.
 #
 
-import numpy as np
 from collections import namedtuple
+import numpy as np
+import random
 
 
 class Synapse(namedtuple('Synapse', ['offset', 'delay'])):
@@ -66,16 +67,21 @@ class WordSet(object):
         delays: Delay slots learned for each word during training.
     """
 
-    def __init__(self, num_words=0):
+    def __init__(self, num_words, word_length, num_delays, num_active):
         """Inits WordSet class.
        
        Args:
            num_words: Number of Words to initialize the WordSet with.
+           word_length: Number of synapses in a Word.
+           num_delays: Number of delay slots.
+           num_active: Number of active synapses per word.
        """
         self.words = []
         self.delays = []
+        synapses = range(word_length)
 
         for i in range(num_words):
+            active_syn = random.sample(synapses, num_active)
             self.words.append(Word())
 
 
