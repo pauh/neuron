@@ -77,7 +77,7 @@ class WordSet(object):
            num_active: Number of active synapses per word.
        """
         self.words = []
-        self.delays = []
+        self.delays = [0] * num_words
         synapses = range(word_length)
 
         for i in range(num_words):
