@@ -75,6 +75,8 @@ class WordSet(object):
            word_length: Number of synapses in a Word.
            num_delays: Number of delay slots.
            num_active: Number of active synapses per word.
+
+       TODO: Add the other initialization method
        """
         self.words = []
         self.delays = [0] * num_words
