@@ -18,6 +18,7 @@
 #
 
 from cognon_extended import Neuron
+from cognon_extended import Synapse
 from cognon_extended import WordSynapse
 from cognon_extended import Word
 from cognon_extended import WordSet
@@ -86,6 +87,19 @@ class TestWordSet:
                 ok_(synapse.offset < word_length)
                 ok_(synapse.delay >= 0)
                 ok_(synapse.delay < num_delays)
+
+
+class TestSynapse:
+
+    @raises(TypeError)
+    def test_construct_requires_args(self):
+        s = Synapse()
+
+    def test_named_attributes(self):
+        s = Synapse(1, 0, 0)
+        eq_(s.strength, 1)
+        eq_(s.delay, 0)
+        eq_(s.container, 0)
 
 
 class TestNeuron:

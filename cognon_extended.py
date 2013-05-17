@@ -36,12 +36,14 @@ class WordSynapse(namedtuple('WordSynapse', ['offset', 'delay'])):
 
 class Word(object):
     """An input Word represents the input signals to the neuron for a time
-    period. A Word contains a list of those input synapses that fired for the
+    period.
+    
+    A Word contains a list of those input synapses that fired for the
     most recent given excitation pattern.
 
     Attributes:
         synapses: A set of pairs containing the syanpses that fired and the
-        associated delay.
+            associated delay.
     """
     
     def __init__(self, fired_syn=[]):
@@ -49,7 +51,8 @@ class Word(object):
 
         Args:
             fired_syn: List of pairs of input synapses that fired and
-            associated delays. Can only contain positive synapse offset values.
+                associated delays. Can only contain positive synapse offset
+                values.
         """
         if len(fired_syn) > 0 and sorted(fired_syn)[0][0] < 0:
             raise ValueError('synapse offset values have to be positive')
@@ -86,6 +89,19 @@ class WordSet(object):
             active_syn = random.sample(synapses, num_active)
             active_delays = np.random.randint(num_delays, size=num_active)
             self.words.append(Word(zip(active_syn, active_delays)))
+
+
+class Synapse(namedtuple('Synapse', ['strength', 'delay', 'container'])):
+    """A Synapse represents a connection between the neuron's input dendrites
+    and the output axons of other neurons.
+
+    Attributes:
+        strength: Strength of the synapse.
+        delay: Represents the time the signal takes to traverse the axon to
+            reach the synapse. Takes a value in range(D1).
+        container: The dendrite compartment of this synapse.
+    """
+    pass
 
 
 class Neuron(object):
