@@ -89,17 +89,21 @@ class WordSet(object):
 
 
 class Neuron(object):
-    """Models a CB neuron.
+    """Models a CE neuron.
 
     Attributes:
         S0: Number of synapses.
         H: Number of synapses needed to fire a neuron.
         G: Ratio of strong synapse strength to weak synapse strength, binary
             approximation.
+        C: Number of dendrite compartments capable of firing independently.
+        D1: Number of possible time slots where neurons can produce spikes.
+        D2: Number of different time delays available between two neural
+            layers.
         training: whether the neuron is in training mode.
     """
 
-    def __init__(self, S0 = 16, H = 4.0, G = 2.0):
+    def __init__(self, S0 = 200, H = 5.0, G = 2.0, C = 1, D1 = 4, D2 = 7):
         """Inits Neuron class.
 
         Args:
@@ -107,11 +111,18 @@ class Neuron(object):
             H: Number of synapses needed to fire a neuron.
             G: Ratio of strong synapse strength to weak synapse strength,
                 binary approximation.
+            C: Number of dendrite compartments capable of firing independently.
+            D1: Number of possible time slots where neurons can produce spikes.
+            D2: Number of different time delays available between two neural
+                layers.
         """
         self.S0 = S0
         self.H = H
         self.G = G
         self.strength = np.ones(S0)
+        self.C = C
+        self.D1 = D1
+        self.D2 = D2
         self.training = False
 
 

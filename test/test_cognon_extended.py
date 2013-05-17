@@ -92,10 +92,13 @@ class TestNeuron:
 
     def test_defaults(self):
         n = Neuron()
-        eq_(n.S0, 16)
-        eq_(n.H, 4.0)
+        eq_(n.S0, 200)
+        eq_(n.H, 5.0)
         eq_(n.G, 2.0)
         eq_(len(n.strength), n.S0)
+        eq_(n.C, 1)
+        eq_(n.D1, 4)
+        eq_(n.D2, 7)
         assert_false(n.training)
 
     def test_expose_not_training(self):
