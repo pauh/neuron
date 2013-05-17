@@ -18,7 +18,7 @@
 #
 
 from cognon_extended import Neuron
-from cognon_extended import Synapse
+from cognon_extended import WordSynapse
 from cognon_extended import Word
 from cognon_extended import WordSet
 
@@ -30,14 +30,14 @@ from nose.tools import ok_
 from nose.tools import raises
 
 
-class TestSynapse:
+class TestWordSynapse:
 
     @raises(TypeError)
     def test_construct_requires_args(self):
-        s = Synapse()
+        s = WordSynapse()
 
     def test_named_attributes(self):
-        s = Synapse(1, 0)
+        s = WordSynapse(1, 0)
         eq_(s.offset, 1)
         eq_(s.delay, 0)
 

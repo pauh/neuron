@@ -22,9 +22,9 @@ import numpy as np
 import random
 
 
-class Synapse(namedtuple('Synapse', ['offset', 'delay'])):
-    """A Synapse represents a connection between the neuron's input dendrites
-    and the output axons of other neurons.
+class WordSynapse(namedtuple('WordSynapse', ['offset', 'delay'])):
+    """A WordSynapse represents a connection between the neuron's input
+    dendrites and the output axons of other neurons.
 
     Attributes:
         offset: Identifies a synapse of the neuron.
@@ -53,7 +53,7 @@ class Word(object):
         """
         if len(fired_syn) > 0 and sorted(fired_syn)[0][0] < 0:
             raise ValueError('synapse offset values have to be positive')
-        self.synapses = [Synapse(*s) for s in fired_syn]
+        self.synapses = [WordSynapse(*s) for s in fired_syn]
 
 
 class WordSet(object):
