@@ -116,6 +116,13 @@ class Neuron(object):
         D1: Number of possible time slots where neurons can produce spikes.
         D2: Number of different time delays available between two neural
             layers.
+        synapses: Represents a connection between the neuron's input dendrites
+            and the output axons of other neurons. Each row of the array
+            contains 3 fields:
+            - strength: Strength of the synapse.
+            - delay: Represents the time the signal takes to traverse the axon
+              to reach the synapse. Takes a value in range(D1).
+            - container: The dendrite compartment of this synapse.
         training: whether the neuron is in training mode.
     """
 
@@ -135,11 +142,13 @@ class Neuron(object):
         self.S0 = S0
         self.H = H
         self.G = G
-        self.strength = np.ones(S0)
         self.C = C
         self.D1 = D1
         self.D2 = D2
         self.training = False
+        self.synapses = np.zeros(S0, dtype='float32,uint16,uint16')
+        self.synapses.dtype.names = ('strength', 'delay', 'container')
+        self.synapses['strength'] = 1.0
 
 
     def expose(self, w):
@@ -148,8 +157,8 @@ class Neuron(object):
 
        Expose computes the weighted sum of the input word, and the neuron fires
        if that sum meets or exceeds a threshold. The weighted sum is the sum of
-       the S0 element-by-element products of the most recent neuron vector, the
-       current word, and the neuron frozen Boolean vector.
+       the S0 element-by-element products of the most recent neuron vector, and
+       the current word.
 
        Args:
            w: A Word to present to the neuron.
@@ -158,8 +167,8 @@ class Neuron(object):
            A Boolean indicating whether the neuron will fire or not.
        """
         # Compute the weighted sum of the firing inputs
-        offset = [s.offset for s in w.synapses]
-        s = self.strength[offset].sum()
+        offsets = [syn.offset for syn in w.synapses]
+        s = self.synapses['strength'][offsets].sum()
         if self.training:
             return s >= self.H
         else:
@@ -186,8 +195,8 @@ class Neuron(object):
         if not self.expose(w): return False
     
         # Set the srength for participating synapses to G
-        offset = [s.offset for s in w.synapses]
-        self.strength[offset] = self.G
+        offsets = [s.offset for s in w.synapses]
+        self.synapses['strength'][offsets] = self.G
     
         return True
 

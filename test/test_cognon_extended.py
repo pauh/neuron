@@ -96,9 +96,9 @@ class TestSynapse:
         s = Synapse()
 
     def test_named_attributes(self):
-        s = Synapse(1, 0, 0)
+        s = Synapse(1, 2, 0)
         eq_(s.strength, 1)
-        eq_(s.delay, 0)
+        eq_(s.delay, 2)
         eq_(s.container, 0)
 
 
@@ -109,10 +109,10 @@ class TestNeuron:
         eq_(n.S0, 200)
         eq_(n.H, 5.0)
         eq_(n.G, 2.0)
-        eq_(len(n.strength), n.S0)
         eq_(n.C, 1)
         eq_(n.D1, 4)
         eq_(n.D2, 7)
+        eq_(len(n.synapses), n.S0)
         assert_false(n.training)
 
     def test_expose_not_training(self):
