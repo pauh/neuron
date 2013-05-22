@@ -91,19 +91,6 @@ class WordSet(object):
             self.words.append(Word(zip(active_syn, active_delays)))
 
 
-class Synapse(namedtuple('Synapse', ['strength', 'delay', 'container'])):
-    """A Synapse represents a connection between the neuron's input dendrites
-    and the output axons of other neurons.
-
-    Attributes:
-        strength: Strength of the synapse.
-        delay: Represents the time the signal takes to traverse the axon to
-            reach the synapse. Takes a value in range(D1).
-        container: The dendrite compartment of this synapse.
-    """
-    pass
-
-
 class Neuron(object):
     """Models a CE neuron.
 
