@@ -98,8 +98,20 @@ class TestNeuron:
         eq_(n.C, 1)
         eq_(n.D1, 4)
         eq_(n.D2, 7)
-        eq_(len(n.synapses), n.S0)
         assert_false(n.training)
+        eq_(len(n.synapses), n.S0)
+        assert_true((n.synapses['strength'] == 1.0).all())
+        assert_true((n.synapses['delay'] >= 0).all())
+        assert_true((n.synapses['delay'] < n.D2).all())
+        assert_true((n.synapses['container'] >= 0).all())
+        assert_true((n.synapses['container'] < n.C).all())
+
+    def test_attributes_in_range(self):
+        n = Neuron()
+        ok_(n.H >= 1.0)
+        ok_(n.C >= 1)
+        ok_(n.D1 <= n.D2)
+        assert_true((n.synapses['strength'] >= 0.0).all())
 
     def test_expose_not_training(self):
         n = Neuron(S0 = 16, H = 4.0, G = 2.0)

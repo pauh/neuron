@@ -108,7 +108,7 @@ class Neuron(object):
             contains 3 fields:
             - strength: Strength of the synapse.
             - delay: Represents the time the signal takes to traverse the axon
-              to reach the synapse. Takes a value in range(D1).
+              to reach the synapse. Takes a value in range(D2).
             - container: The dendrite compartment of this synapse.
         training: whether the neuron is in training mode.
     """
@@ -136,6 +136,8 @@ class Neuron(object):
         self.synapses = np.zeros(S0, dtype='float32,uint16,uint16')
         self.synapses.dtype.names = ('strength', 'delay', 'container')
         self.synapses['strength'] = 1.0
+        self.synapses['delay'] = np.random.randint(D2, size=S0)
+        self.synapses['container'] = np.random.randint(C, size=S0)
 
 
     def expose(self, w):
