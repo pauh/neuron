@@ -158,10 +158,11 @@ class Neuron(object):
         container_sums = np.zeros(self.C)
 
         # Compute the weighted sum of the firing inputs for each container
-        for input_syn in w.synapses:
-            synapse = self.synapses[input_syn.offset]
-            container = synapse['container']
-            container_sums[container] += synapse['strength']
+        offsets = [syn.offset for syn in w.synapses]
+        synapses = self.synapses[offsets]
+        for i in range(self.C):
+            indices = synapses['container'] == i
+            container_sums[i] = synapses['strength'][indices].sum()
 
         for s in container_sums:
             if self.training and s >= self.H: return True
