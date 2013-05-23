@@ -114,7 +114,7 @@ class TestNeuron:
         assert_true((n.synapses['strength'] >= 0.0).all())
 
     def test_expose_not_training(self):
-        n = Neuron(S0 = 16, H = 4.0, G = 2.0)
+        n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1)
 
         w1 = Word([(1,0), (6,0), (9,0)])
         assert_false(n.expose(w1))
@@ -127,6 +127,29 @@ class TestNeuron:
         n = Neuron(S0 = 16)
         w = Word([(16,0)])
         n.expose(w)
+
+    def test_expose_multiple_containers(self):
+        n = Neuron(S0 = 16, H = 2.0, G = 2.0, C = 3, D1 = 1, D2 = 1)
+
+        # Set container assignment manually to remove randomness
+        n.synapses['container'][ 0:10] = 0
+        n.synapses['container'][10:14] = 1
+        n.synapses['container'][14:16] = 2
+
+        w1 = Word([(1,0), (2,0), (6,0)])
+        assert_false(n.expose(w1))
+
+        w2 = Word([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0)])
+        assert_true(n.expose(w2))
+
+        w3 = Word([(10,0), (11,0), (12,0), (13,0)])
+        assert_true(n.expose(w3))
+
+        w4 = Word([(14,0), (15,0)])
+        assert_false(n.expose(w4))
+
+    def test_expose_with_delays(self):
+        pass
 
     def test_train(self):
         n = Neuron(16, 4.0, 2.0)

@@ -144,39 +144,46 @@ class Neuron(object):
         """Models how the neuron reacts to excitation patterns, and how it
         computes whether or not to fire.
 
-       Expose computes the weighted sum of the input word, and the neuron fires
-       if that sum meets or exceeds a threshold. The weighted sum is the sum of
-       the S0 element-by-element products of the most recent neuron vector, and
-       the current word.
+        Expose computes the weighted sum of the input word, and the neuron fires
+        if that sum meets or exceeds a threshold. The weighted sum is the sum of
+        the S0 element-by-element products of the most recent neuron vector and
+        the current word.
 
-       Args:
-           w: A Word to present to the neuron.
+        Args:
+            w: A Word to present to the neuron.
 
-       Returns:
-           A Boolean indicating whether the neuron will fire or not.
-       """
-        # Compute the weighted sum of the firing inputs
-        offsets = [syn.offset for syn in w.synapses]
-        s = self.synapses['strength'][offsets].sum()
-        if self.training:
-            return s >= self.H
-        else:
-            return s >= self.H*self.G
+        Returns:
+            A Boolean indicating whether the neuron will fire or not.
+        """
+        container_sums = np.zeros(self.C)
+
+        # Compute the weighted sum of the firing inputs for each container
+        for input_syn in w.synapses:
+            synapse = self.synapses[input_syn.offset]
+            container = synapse['container']
+            container_sums[container] += synapse['strength']
+
+        for s in container_sums:
+            if self.training and s >= self.H: return True
+            elif s >= self.H*self.G: return True
+
+        # If no container has fired
+        return False
     
     
     def train(self, w):
         """Trains a neuron with an input word.
     
-       To train a neuron, "train" is called for each word to be recognized. If
-       the neuron fires for that word then all synapses that contributed to
-       that firing have their strengths irreversibly increased to G.
+        To train a neuron, "train" is called for each word to be recognized. If
+        the neuron fires for that word then all synapses that contributed to
+        that firing have their strengths irreversibly increased to G.
 
-       Args:
-           w: A Word to train the neuron with.
-    
-       Returns:
-           A Boolean indicating whether the neuron fired or not.
-       """
+        Args:
+            w: A Word to train the neuron with.
+
+        Returns:
+            A Boolean indicating whether the neuron fired or not.
+        """
         if not self.training:
             print "[WARN] train(w) was called when not in training mode."
             return False
