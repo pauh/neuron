@@ -155,16 +155,14 @@ class Neuron(object):
         Returns:
             A Boolean indicating whether the neuron will fire or not.
         """
-        container_sums = np.zeros(self.C)
-
         # Compute the weighted sum of the firing inputs for each container
         offsets = [syn.offset for syn in w.synapses]
         synapses = self.synapses[offsets]
         for i in range(self.C):
             indices = synapses['container'] == i
-            container_sums[i] = synapses['strength'][indices].sum()
+            s = synapses['strength'][indices].sum()
 
-        for s in container_sums:
+            # Check if the container has fired
             if self.training and s >= self.H: return True
             elif s >= self.H*self.G: return True
 

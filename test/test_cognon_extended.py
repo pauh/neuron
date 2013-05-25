@@ -149,7 +149,7 @@ class TestNeuron:
         assert_false(n.expose(w4))
 
     def test_expose_with_delays(self):
-        pass
+        n = Neuron(S0 = 16, H = 2.0, G = 2.0, C = 3, D1 = 1, D2 = 1)
 
     def test_train(self):
         n = Neuron(16, 4.0, 2.0)
