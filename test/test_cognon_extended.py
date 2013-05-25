@@ -162,14 +162,17 @@ class TestNeuron:
         w2 = Word([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0)])
         assert_true(n.expose(w2))
 
-        w3 = Word([(1,0), (2,0), (3,0), (4,1), (5,1), (6,1)])
-        assert_true(n.expose(w3))
-
-        w4 = Word([(10,1), (11,1), (12,1), (13,1)])
+        w3 = Word([(1,1), (2,1), (3,1), (4,1), (5,0), (6,0)])
         assert_true(n.expose(w4))
 
-        w5 = Word([(12,0), (13,0), (14,0), (15,0)])
-        assert_false(n.expose(w5))
+        w4 = Word([(1,0), (2,0), (3,0), (4,1), (5,1), (6,1)])
+        assert_false(n.expose(w4))
+
+        w5 = Word([(10,1), (11,1), (12,1), (13,1)])
+        assert_true(n.expose(w5))
+
+        w6 = Word([(12,0), (13,0), (14,0), (15,0)])
+        assert_false(n.expose(w6))
 
     def test_train(self):
         n = Neuron(16, 4.0, 2.0)
