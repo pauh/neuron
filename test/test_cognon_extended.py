@@ -163,7 +163,7 @@ class TestNeuron:
         assert_true(n.expose(w2))
 
         w3 = Word([(1,1), (2,1), (3,1), (4,1), (5,0), (6,0)])
-        assert_true(n.expose(w4))
+        assert_true(n.expose(w3))
 
         w4 = Word([(1,0), (2,0), (3,0), (4,1), (5,1), (6,1)])
         assert_false(n.expose(w4))
