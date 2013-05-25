@@ -149,7 +149,27 @@ class TestNeuron:
         assert_false(n.expose(w4))
 
     def test_expose_with_delays(self):
-        n = Neuron(S0 = 16, H = 2.0, G = 2.0, C = 3, D1 = 1, D2 = 1)
+        n = Neuron(S0 = 16, H = 2.0, G = 2.0, C = 1, D1 = 2, D2 = 3)
+
+        # Set delay assignment manually to remove randomness
+        n.synapses['delay'][ 0:10] = 0
+        n.synapses['delay'][10:14] = 1
+        n.synapses['delay'][14:16] = 2
+
+        w1 = Word([(1,0), (2,0), (6,0)])
+        assert_false(n.expose(w1))
+
+        w2 = Word([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0)])
+        assert_true(n.expose(w2))
+
+        w3 = Word([(1,0), (2,0), (3,0), (4,1), (5,1), (6,1)])
+        assert_true(n.expose(w3))
+
+        w4 = Word([(10,1), (11,1), (12,1), (13,1)])
+        assert_true(n.expose(w4))
+
+        w5 = Word([(12,0), (13,0), (14,0), (15,0)])
+        assert_false(n.expose(w5))
 
     def test_train(self):
         n = Neuron(16, 4.0, 2.0)
