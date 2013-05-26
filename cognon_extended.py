@@ -155,19 +155,25 @@ class Neuron(object):
         Returns:
             A Boolean indicating whether the neuron will fire or not.
         """
-        # Compute the weighted sum of the firing inputs for each container
         offsets = [syn.offset for syn in w.synapses]
+        delays  = [syn.delay  for syn in w.synapses]
         synapses = self.synapses[offsets]
-        for i in range(self.C):
-            indices = synapses['container'] == i
-            s = synapses['strength'][indices].sum()
 
-            # Check if the container has fired
-            if self.training and s >= self.H: return True
-            elif s >= self.H*self.G: return True
+        # For each possible delay
+        for d in range(self.D1 + self.D2):
+            delay_indices = (synapses['delay'] + delays) == d
 
-        # If no container has fired
-        return False
+            # Compute the weighted sum of the firing inputs for each container
+            for i in range(self.C):
+                indices = delay_indices & synapses['container'] == i
+                s = synapses['strength'][indices].sum()
+
+                # Check if the container has fired
+                if self.training and s >= self.H: return True
+                elif s >= self.H*self.G: return True
+
+            # If no container has fired
+            return False
     
     
     def train(self, w):
