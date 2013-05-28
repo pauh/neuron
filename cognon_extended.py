@@ -153,7 +153,10 @@ class Neuron(object):
             w: A Word to present to the neuron.
 
         Returns:
-            A Boolean indicating whether the neuron will fire or not.
+            A 3-element tuple containing:
+                0. A Boolean indicating whether the neuron fired or not.
+                1. The delay in which the neuron has fired.
+                2. The container where the firing occurred.
         """
         offsets = [syn.offset for syn in w.synapses]
         delays  = [syn.delay  for syn in w.synapses]
@@ -164,17 +167,17 @@ class Neuron(object):
             delay_indices = (synapses['delay'] + delays) == d
 
             # Compute the weighted sum of the firing inputs for each container
-            for i in range(self.C):
-                container_indices = synapses['container'] == i
+            for c in range(self.C):
+                container_indices = synapses['container'] == c
                 indices = delay_indices & container_indices
                 s = synapses['strength'][indices].sum()
 
                 # Check if the container has fired
-                if self.training and s >= self.H: return True
-                elif s >= self.H*self.G: return True
+                if (self.training and s >= self.H) or s >= self.H*self.G:
+                    return (True, d, c)
 
         # If no container has fired for any delay
-        return False
+        return (False, None, None)
     
     
     def train(self, w):
@@ -194,7 +197,8 @@ class Neuron(object):
             print "[WARN] train(w) was called when not in training mode."
             return False
         
-        if not self.expose(w): return False
+        fired, delay, container = self.expose(w)
+        if not fired: return False
     
         # Set the srength for participating synapses to G
         offsets = [s.offset for s in w.synapses]

@@ -23,7 +23,11 @@ from cognon_extended import Word
 from cognon_extended import WordSet
 
 from nose.tools import assert_false
+from nose.tools import assert_greater_equal
 from nose.tools import assert_in
+from nose.tools import assert_is_none
+from nose.tools import assert_less
+from nose.tools import assert_less_equal
 from nose.tools import assert_true
 from nose.tools import eq_
 from nose.tools import ok_
@@ -82,10 +86,10 @@ class TestWordSet:
             word = ws.words[i]
             eq_(len(word.synapses), num_active)
             for synapse in word.synapses:
-                ok_(synapse.offset >= 0)
-                ok_(synapse.offset < word_length)
-                ok_(synapse.delay >= 0)
-                ok_(synapse.delay < num_delays)
+                assert_greater_equal(synapse.offset, 0)
+                assert_less(synapse.offset, word_length)
+                assert_greater_equal(synapse.delay, 0)
+                assert_less(synapse.delay, num_delays)
 
 
 class TestNeuron:
@@ -108,19 +112,25 @@ class TestNeuron:
 
     def test_attributes_in_range(self):
         n = Neuron()
-        ok_(n.H >= 1.0)
-        ok_(n.C >= 1)
-        ok_(n.D1 <= n.D2)
+        assert_greater_equal(n.H, 1.0)
+        assert_greater_equal(n.C, 1)
+        assert_less_equal(n.D1, n.D2)
         assert_true((n.synapses['strength'] >= 0.0).all())
 
     def test_expose_not_training(self):
         n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1, D1 = 1, D2 = 1)
 
-        w1 = Word([(1,0), (6,0), (9,0)])
-        assert_false(n.expose(w1))
+        w = Word([(1,0), (6,0), (9,0)])
+        fired, delay, container = n.expose(w)
+        assert_false(fired)
+        assert_is_none(delay)
+        assert_is_none(container)
 
-        w2 = Word([(1,0), (3,0), (4,0), (5,0), (6,0), (8,0), (9,0), (14,0)])
-        assert_true(n.expose(w2))
+        w = Word([(1,0), (3,0), (4,0), (5,0), (6,0), (8,0), (9,0), (14,0)])
+        fired, delay, container = n.expose(w)
+        assert_true(fired)
+        eq_(delay, 0)
+        eq_(container, 0)
 
     @raises(IndexError)
     def test_expose_index_error(self):
@@ -136,17 +146,29 @@ class TestNeuron:
         n.synapses['container'][10:14] = 1
         n.synapses['container'][14:16] = 2
 
-        w1 = Word([(1,0), (2,0), (6,0)])
-        assert_false(n.expose(w1))
+        w = Word([(1,0), (2,0), (6,0)])
+        fired, delay, container = n.expose(w)
+        assert_false(fired)
+        assert_is_none(delay)
+        assert_is_none(container)
 
-        w2 = Word([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0)])
-        assert_true(n.expose(w2))
+        w = Word([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0)])
+        fired, delay, container = n.expose(w)
+        assert_true(fired)
+        eq_(delay, 0)
+        eq_(container, 0)
 
-        w3 = Word([(10,0), (11,0), (12,0), (13,0)])
-        assert_true(n.expose(w3))
+        w = Word([(10,0), (11,0), (12,0), (13,0)])
+        fired, delay, container = n.expose(w)
+        assert_true(fired)
+        eq_(delay, 0)
+        eq_(container, 1)
 
-        w4 = Word([(14,0), (15,0)])
-        assert_false(n.expose(w4))
+        w = Word([(14,0), (15,0)])
+        fired, delay, container = n.expose(w)
+        assert_false(fired)
+        assert_is_none(delay)
+        assert_is_none(container)
 
     def test_expose_with_delays(self):
         n = Neuron(S0 = 16, H = 2.0, G = 2.0, C = 1, D1 = 2, D2 = 3)
@@ -156,23 +178,41 @@ class TestNeuron:
         n.synapses['delay'][10:14] = 1
         n.synapses['delay'][14:16] = 2
 
-        w1 = Word([(1,0), (2,0), (6,0)])
-        assert_false(n.expose(w1))
+        w = Word([(1,0), (2,0), (6,0)])
+        fired, delay, container = n.expose(w)
+        assert_false(fired)
+        assert_is_none(delay)
+        assert_is_none(container)
 
-        w2 = Word([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0)])
-        assert_true(n.expose(w2))
+        w = Word([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0)])
+        fired, delay, container = n.expose(w)
+        assert_true(fired)
+        eq_(delay, 0)
+        eq_(container, 0)
 
-        w3 = Word([(1,1), (2,1), (3,1), (4,1), (5,0), (6,0)])
-        assert_true(n.expose(w3))
+        w = Word([(1,1), (2,1), (3,1), (4,1), (5,0), (6,0)])
+        fired, delay, container = n.expose(w)
+        assert_true(fired)
+        eq_(delay, 1)
+        eq_(container, 0)
 
-        w4 = Word([(1,0), (2,0), (3,0), (4,1), (5,1), (6,1)])
-        assert_false(n.expose(w4))
+        w = Word([(1,0), (2,0), (3,0), (4,1), (5,1), (6,1)])
+        fired, delay, container = n.expose(w)
+        assert_false(fired)
+        assert_is_none(delay)
+        assert_is_none(container)
 
-        w5 = Word([(10,1), (11,1), (12,1), (13,1)])
-        assert_true(n.expose(w5))
+        w = Word([(10,1), (11,1), (12,1), (13,1)])
+        fired, delay, container = n.expose(w)
+        assert_true(fired)
+        eq_(delay, 2)
+        eq_(container, 0)
 
-        w6 = Word([(12,0), (13,0), (14,0), (15,0)])
-        assert_false(n.expose(w6))
+        w = Word([(12,0), (13,0), (14,0), (15,0)])
+        fired, delay, container = n.expose(w)
+        assert_false(fired)
+        assert_is_none(delay)
+        assert_is_none(container)
 
     def test_train(self):
         n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1, D1 = 1, D2 = 1)
@@ -186,11 +226,14 @@ class TestNeuron:
 
         wD = Word([(2,0), (6,0), (12,0), (14,0)])
         wE = Word([(3,0), (7,0), (9,0), (13,0)])
-        assert_false(n.expose(wD))
-        assert_false(n.expose(wE))
+        fired, delay, container = n.expose(wD)
+        assert_false(fired)
+        fired, delay, container = n.expose(wE)
+        assert_false(fired)
 
         wF = Word([(1,0), (4,0), (9,0), (14,0)])
-        assert_true(n.expose(wF))
+        fired, delay, container = n.expose(wF)
+        assert_true(fired)
 
     def test_train_not_training(self):
         n = Neuron()
