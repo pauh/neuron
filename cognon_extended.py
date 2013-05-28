@@ -159,21 +159,22 @@ class Neuron(object):
         delays  = [syn.delay  for syn in w.synapses]
         synapses = self.synapses[offsets]
 
-        # For each possible delay
+        # Iterate over delays until neuron fires
         for d in range(self.D1 + self.D2):
             delay_indices = (synapses['delay'] + delays) == d
 
             # Compute the weighted sum of the firing inputs for each container
             for i in range(self.C):
-                indices = delay_indices & synapses['container'] == i
+                container_indices = synapses['container'] == i
+                indices = delay_indices & container_indices
                 s = synapses['strength'][indices].sum()
 
                 # Check if the container has fired
                 if self.training and s >= self.H: return True
                 elif s >= self.H*self.G: return True
 
-            # If no container has fired
-            return False
+        # If no container has fired for any delay
+        return False
     
     
     def train(self, w):
