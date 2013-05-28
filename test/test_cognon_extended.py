@@ -114,7 +114,7 @@ class TestNeuron:
         assert_true((n.synapses['strength'] >= 0.0).all())
 
     def test_expose_not_training(self):
-        n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1)
+        n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1, D1 = 1, D2 = 1)
 
         w1 = Word([(1,0), (6,0), (9,0)])
         assert_false(n.expose(w1))
@@ -175,7 +175,7 @@ class TestNeuron:
         assert_false(n.expose(w6))
 
     def test_train(self):
-        n = Neuron(16, 4.0, 2.0)
+        n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1, D1 = 1, D2 = 1)
         wA = Word([(1,0), (6,0), (9,0), (14,0)])
         wB = Word([(3,0), (4,0), (9,0), (13,0)])
 
