@@ -216,6 +216,8 @@ class TestNeuron:
 
     def test_train(self):
         n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1, D1 = 1, D2 = 1)
+
+        # Train neuron with 2 patterns
         wA = Word([(1,0), (6,0), (9,0), (14,0)])
         wB = Word([(3,0), (4,0), (9,0), (13,0)])
 
@@ -224,19 +226,52 @@ class TestNeuron:
         assert_true(n.train(wB))
         n.finish_training()
 
+        # Test recognition
         wD = Word([(2,0), (6,0), (12,0), (14,0)])
-        wE = Word([(3,0), (7,0), (9,0), (13,0)])
         fired, delay, container = n.expose(wD)
         assert_false(fired)
+
+        wE = Word([(3,0), (7,0), (9,0), (13,0)])
         fired, delay, container = n.expose(wE)
         assert_false(fired)
-
+        
         wF = Word([(1,0), (4,0), (9,0), (14,0)])
         fired, delay, container = n.expose(wF)
-        assert_true(fired)
+        assert_true(fired) # False alarm
 
     def test_train_not_training(self):
         n = Neuron()
         w = Word()
         assert_false(n.train(w))
+
+    def test_train_with_delays(self):
+        n = Neuron(S0 = 16, H = 4.0, G = 2.0, C = 1, D1 = 2, D2 = 2)
+
+        # Fix neuron delays manually for the test 
+        n.synapses['delay'] = 1
+        n.synapses['delay'][1] = 0
+        n.synapses['delay'][14] = 0
+
+        # Train neuron with 2 patterns
+        wA = Word([(1,1), (6,0), (9,0), (14,1)])
+        wB = Word([(3,0), (4,0), (9,0), (13,0)])
+
+        n.start_training()
+        assert_true(n.train(wA))
+        assert_true(n.train(wB))
+        n.finish_training()
+
+        # Recognize
+        wD = Word([(2,0), (6,0), (12,0), (14,0)])
+        fired, delay, container = n.expose(wD)
+        assert_false(fired)
+
+        wE = Word([(1,1), (3,0), (9,0), (13,0)])
+        fired, delay, container = n.expose(wE)
+        assert_true(fired) # False alarm
+
+        wF = Word([(1,0), (4,1), (7,0), (9,0), (11,0), (14,0)])
+        fired, delay, container = n.expose(wF)
+        assert_false(fired)
+
 

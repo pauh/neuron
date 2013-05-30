@@ -200,9 +200,20 @@ class Neuron(object):
         fired, delay, container = self.expose(w)
         if not fired: return False
     
-        # Set the srength for participating synapses to G
+        # Update the synapses that contributed to the firing
         offsets = [s.offset for s in w.synapses]
-        self.synapses['strength'][offsets] = self.G
+        delays  = [syn.delay  for syn in w.synapses]
+        
+        synapses = self.synapses[offsets]
+
+        delay_indices = (synapses['delay'] + delays) == delay
+        container_indices = synapses['container'] == container
+        active_indices = delay_indices & container_indices
+
+        indices = np.zeros(self.S0, dtype=bool)
+        indices[offsets] = active_indices
+
+        self.synapses['strength'][indices] = self.G
     
         return True
 
