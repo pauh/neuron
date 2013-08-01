@@ -1,6 +1,6 @@
 # Copyright 2013 Pau Haro Negre
 # based on C++ code by Carl Staelin Copyright 2009-2011
-# 
+#
 # See the NOTICE file distributed with this work for additional information
 # regarding copyright ownership.
 #
@@ -34,10 +34,11 @@ class Synapse(namedtuple('Synapse', ['offset', 'delay'])):
     pass
 
 
+
 class Word(object):
     """An input Word represents the input signals to the neuron for a time
     period.
-    
+
     A Word contains a list of those input synapses that fired for the
     most recent given excitation pattern.
 
@@ -45,7 +46,7 @@ class Word(object):
         synapses: A set of pairs containing the syanpses that fired and the
             associated delay.
     """
-    
+
     def __init__(self, fired_syn=[]):
         """Inits Word class.
 
@@ -57,6 +58,7 @@ class Word(object):
         if len(fired_syn) > 0 and sorted(fired_syn)[0][0] < 0:
             raise ValueError('synapse offset values have to be positive')
         self.synapses = [Synapse(*s) for s in fired_syn]
+
 
 
 class WordSet(object):
@@ -72,7 +74,7 @@ class WordSet(object):
 
     def __init__(self, num_words, word_length, num_delays, num_active):
         """Inits WordSet class.
-       
+
        Args:
            num_words: Number of Words to initialize the WordSet with.
            word_length: Number of synapses in a Word.
@@ -89,6 +91,7 @@ class WordSet(object):
             active_syn = random.sample(synapses, num_active)
             active_delays = np.random.randint(num_delays, size=num_active)
             self.words.append(Word(zip(active_syn, active_delays)))
+
 
 
 class Neuron(object):
@@ -178,11 +181,11 @@ class Neuron(object):
 
         # If no container has fired for any delay
         return (False, None, None)
-    
-    
+
+
     def train(self, w):
         """Trains a neuron with an input word.
-    
+
         To train a neuron, "train" is called for each word to be recognized. If
         the neuron fires for that word then all synapses that contributed to
         that firing have their strengths irreversibly increased to G.
@@ -196,14 +199,14 @@ class Neuron(object):
         if not self.training:
             print "[WARN] train(w) was called when not in training mode."
             return False
-        
+
         fired, delay, container = self.expose(w)
         if not fired: return False
-    
+
         # Update the synapses that contributed to the firing
         offsets = [s.offset for s in w.synapses]
         delays  = [syn.delay  for syn in w.synapses]
-        
+
         synapses = self.synapses[offsets]
 
         delay_indices = (synapses['delay'] + delays) == delay
@@ -214,10 +217,10 @@ class Neuron(object):
         indices[offsets] = active_indices
 
         self.synapses['strength'][indices] = self.G
-    
+
         return True
 
-    
+
     def start_training(self):
         """Set the neuron in training mode.
        """
@@ -226,7 +229,7 @@ class Neuron(object):
 
     def finish_training(self):
         """Set the neuron in recognition mode.
-    
+
        Once the training is complete, the neuron's threshold value H is set
        to H*G.
        """

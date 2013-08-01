@@ -35,6 +35,7 @@ class Alice(object):
         neuron.finish_training()
 
 
+
 class Bob(object):
 
     def __init__(self):
@@ -61,6 +62,7 @@ class Bob(object):
                 self.false_true += 1
             else:
                 self.false_false += 1
+
 
 
 class Cognon(object):

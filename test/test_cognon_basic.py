@@ -1,6 +1,6 @@
 # Copyright 2013 Pau Haro Negre
 # based on C++ code by Carl Staelin Copyright 2009-2011
-# 
+#
 # See the NOTICE file distributed with this work for additional information
 # regarding copyright ownership.
 #
