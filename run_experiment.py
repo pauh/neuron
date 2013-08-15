@@ -20,6 +20,8 @@
 from cognon_extended import Neuron
 from cognon_extended import WordSet
 
+from math import log
+from multiprocessing import Pool
 import numpy as np
 import random
 
@@ -65,46 +67,102 @@ class Bob(object):
 
 
 
+class Configuration(object):
+
+    def __init__(self):
+        self.neuron_params()
+        self.test_params()
+
+
+    def neuron_params(self, C = 1, D1 = 4, D2 = 7, Q = 40, R = 1, G = 2, H = 5):
+        self.H = H   # Num. of synapses needed to fire a neuron
+        self.G = G   # Ratio of strong synapse strength to weak synapse s.
+        self.C = C   # Num. of dendrite compartments
+        self.D1 = D1 # Num. of posible time slots where spikes can happen
+        self.D2 = D2 # Num. of time delays available between two layers
+        self.Q = Q   # Q = S0/(H*R*C)
+        self.R = R   # Avg. num. of patterns per afferent synapse spike
+
+
+    def test_params(self, num_active = 4, w = 100, num_test_words = 0):
+        self.num_active = num_active # Num. of active synapses per word
+        self.w = w   # Num. of words to train the neuron with
+        self.num_test_words = num_test_words # Num. of words to test
+
+
+    @property
+    def S0(self):
+        return int(self.Q * self.H * self.C * self.R)
+
+
+
 class Cognon(object):
 
-    def run_configuration(self, repetitions):
+    def __call__(self, config):
+        return self.run_experiment(config)
+
+
+    def run_configuration(self, config, repetitions):
 
         # Ensure that at least 10,000 words are learnt
-        min_learn_words = 10000
-        #N = repetitions
-        #if N * w < min_learn_words:
-        #    N = min_learn_words/w
+        MIN_LEARN_WORDS = 10000
+        MIN_LEARN_WORDS = 1
+        if repetitions * config.w < MIN_LEARN_WORDS:
+            N = MIN_LEARN_WORDS/config.w
+        else:
+            N = repetitions
 
         # Ensure that at least 1,000,000 words are tested
-        min_test_words = 1000000
-        #K = min_test_words/N
+        MIN_TEST_WORDS = 1000000
+        if not config.num_test_words:
+            config.num_test_words = MIN_TEST_WORDS/N
 
-        #for i in xrange(N):
-        #    run_experiment(i)
+        # Run all the experiments
+        #values = [self.run_experiment(config) for i in xrange(N)]
+        pool = Pool(processes=20)
+        values = pool.map(Cognon(), [config,]*N)
 
-        # Config for each experiment:
-        # - neuron
-        #    S0, H, G, C, D1, D2, (num_active or refractory_period)
-        # - training
-        #    num_train_words (w)
-        # - test
-        #    num_test_words
+        # Store the results in a NumPy structured array
+        names = ('pL', 'pF', 'L')
+        types = [np.float64,] * len(values)
+        r = np.array(values, dtype = zip(names, types))
+
+        return r
 
 
-    def run_experiment(self):
+    def run_experiment(self, cfg):
 
         # create a neuron instance with the provided parameters
-        neuron = Neuron(S0, H, G, C, D1, D2)
+        neuron = Neuron(cfg.S0, cfg.H, cfg.G, cfg.C, cfg.D1, cfg.D2)
 
         # create the training and test wordsets
-        train_wordset = WordSet(num_train_words, S0, D1, num_active)
-        test_wordset = WordSet(num_test_words, S0, D1, num_active)
+        train_wordset = WordSet(cfg.w, cfg.S0, cfg.D1, cfg.num_active)
+        test_wordset = WordSet(cfg.num_test_words, cfg.S0, cfg.D1,
+                               cfg.num_active)
 
         # create Alice instance to train the neuron
         alice = Alice()
-        alice.train(n, train_wordset)
+        alice.train(neuron, train_wordset)
 
         # create a Bob instance to test the neuron
         bob = Bob()
         bob.test(neuron, train_wordset, test_wordset)
+
+        # results
+        pL = bob.true_true/float(cfg.w)
+        pF = bob.false_true/float(cfg.num_test_words)
+
+        # L  = w*((1-pL)*log2((1-pL)/(1-pF)) + pL*log2(pL/pF)) bits
+        L = 0
+        if pL == 1.0:
+            if pF != 0:
+                L = -cfg.w*log(pF)/log(2.0)
+            else:
+                L = cfg.w
+        elif pL > pF:
+            L = cfg.w/log(2.0) * \
+                (log(1.0 - pL) - log(1.0 - pF) +
+                 pL * (log(1.0 - pF) - log(1.0 - pL) + log(pL) - log(pF)))
+
+        return pL, pF, L
 
