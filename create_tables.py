@@ -32,14 +32,11 @@ def run_table_row(w, active, C, D1, D2, Q, R, G, H):
     return cognon.run_configuration(config, repetitions)
 
 
-def table21_row(N, H, S, w, G):
-    r = run_table_row(w, N, 1, 1, 1, S/float(H), 1, G, float(H))
-    pF_mean = r['pF'].mean()*100
-    pF_std  = r['pF'].std()*100
-    L_mean  = r['L'].mean()
-    print "{:.2f}\t{:.2}\t{:.1f}".format(pF_mean, pF_std, L_mean)
-
 def table21():
+    print "%%%%%%%%%%%%%%"
+    print "% Table 2.1. %"
+    print "%%%%%%%%%%%%%%"
+    print
               # N | H |  S0  |  w  | G #
     table21_row( 4,  4,    10,   1, 100)
     table21_row( 5,  4,    10,   1, 100)
@@ -51,4 +48,22 @@ def table21():
     table21_row(11, 10, 10000, 600, 100)
     table21_row(22, 20, 10000, 450, 100)
 
-table21()
+    print "\t\\midrule"
+
+    table21_row(10, 10,   100,   6, 1.5)
+    table21_row(11, 10,  1000,  15, 1.5)
+    table21_row(11, 10, 10000, 160, 1.5)
+    table21_row(14, 10, 10000,  10, 1.5)
+
+def table21_row(N, H, S, w, G):
+    r = run_table_row(w, N, 1, 1, 1, S/float(H), 1, G, float(H))
+    pF_mean = r['pF'].mean()*100
+    pF_std  = r['pF'].std()*100
+    L_mean  = r['L'].mean()
+    L_S0    = L_mean/S
+    txt = "\t{:.2f} & {} & {} & {:,} & {} & {} & {:.1f} & {:.2f} \\\\"
+    print txt.format(pF_mean, N, H, S, w, G, L_mean, L_S0)
+
+
+if __name__ == "__main__":
+    table21()
