@@ -72,7 +72,8 @@ class WordSet(object):
         delays: Delay slots learned for each word during training.
     """
 
-    def __init__(self, num_words, word_length, num_delays, num_active):
+    def __init__(self, num_words, word_length, num_delays, num_active=None,
+                       refractory_period=None):
         """Inits WordSet class.
 
        Args:
@@ -80,17 +81,26 @@ class WordSet(object):
            word_length: Number of synapses in a Word.
            num_delays: Number of delay slots.
            num_active: Number of active synapses per word.
-
-       TODO: Add the other initialization method
+           refractory_period: Average number of different patterns presented
+                              before a given neuron fires.
        """
-        self.words = []
-        self.delays = [0] * num_words
-        synapses = range(word_length)
+        # Distribution of the number of active synapses per word?
+        if num_active != None:
+            # fixed: N
+            N_array = np.empty(num_words, int)
+            N_array.fill(num_active)
+        else:
+            # binomial: B(S0, R/S0)
+            R_S0 = refractory_period/float(word_length) # R/S0
+            N_array = np.random.binomial(word_length, R_S0, num_words)
 
-        for i in range(num_words):
-            active_syn = random.sample(synapses, num_active)
-            active_delays = np.random.randint(num_delays, size=num_active)
-            self.words.append(Word(zip(active_syn, active_delays)))
+        # Generate the set of words and set delays to 0
+        synapses = range(word_length)
+        self.words = [Word(zip(
+                random.sample(synapses, N),              # active synapses
+                np.random.randint(num_delays, size=N)))  # active delays
+            for N in N_array]
+        self.delays = [0] * num_words
 
 
 

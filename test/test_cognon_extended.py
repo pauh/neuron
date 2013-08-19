@@ -62,7 +62,7 @@ class TestWord:
         assert_in((1,0), w.synapses)
         assert_in((3,0), w.synapses)
         assert_in((8,0), w.synapses)
-    
+
     def test_delay_0(self):
         w = Word([(1,0),(3,0),(8,0)])
         for offset, delay in w.synapses:
@@ -76,15 +76,34 @@ class TestWordSet:
         word_length = 16
         num_delays = 4
         num_active = 4
-        
+
         ws = WordSet(num_words, word_length, num_delays, num_active)
-        
+
         eq_(len(ws.words), num_words)
         eq_(len(ws.delays), num_words)
 
-        for i in range(num_words):
-            word = ws.words[i]
+        for word in ws.words:
             eq_(len(word.synapses), num_active)
+            for synapse in word.synapses:
+                assert_greater_equal(synapse.offset, 0)
+                assert_less(synapse.offset, word_length)
+                assert_greater_equal(synapse.delay, 0)
+                assert_less(synapse.delay, num_delays)
+
+    def test_refractory_period(self):
+        num_words = 5
+        word_length = 16
+        num_delays = 4
+        num_active = None
+        refractory_period = 4
+
+        ws = WordSet(num_words, word_length, num_delays, num_active,
+                refractory_period)
+
+        eq_(len(ws.words), num_words)
+        eq_(len(ws.delays), num_words)
+
+        for word in ws.words:
             for synapse in word.synapses:
                 assert_greater_equal(synapse.offset, 0)
                 assert_less(synapse.offset, word_length)
