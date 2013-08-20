@@ -74,25 +74,28 @@ class Configuration(object):
         self.test_params()
 
 
-    def neuron_params(self, C = 1, D1 = 4, D2 = 7, Q = 40, R = 1, G = 2, H = 5):
+    def neuron_params(self, C = 1, D1 = 4, D2 = 7, Q = 40, G = 2, H = 5):
         self.H = H   # Num. of synapses needed to fire a neuron
         self.G = G   # Ratio of strong synapse strength to weak synapse s.
         self.C = C   # Num. of dendrite compartments
         self.D1 = D1 # Num. of posible time slots where spikes can happen
         self.D2 = D2 # Num. of time delays available between two layers
         self.Q = Q   # Q = S0/(H*R*C)
-        self.R = R   # Avg. num. of patterns per afferent synapse spike
 
 
-    def test_params(self, num_active = 4, w = 100, num_test_words = 0):
+    def test_params(self, num_active = 4, R = None, w = 100, num_test_words = 0):
         self.num_active = num_active # Num. of active synapses per word
+        self.R = R   # Avg. num. of patterns per afferent synapse spike
         self.w = w   # Num. of words to train the neuron with
         self.num_test_words = num_test_words # Num. of words to test
 
 
     @property
     def S0(self):
-        return int(self.Q * self.H * self.C * self.R)
+        if self.R:
+            return int(self.Q * self.H * self.C * self.R)
+        else:
+            return int(self.Q * self.H * self.C)
 
 
 
@@ -136,9 +139,9 @@ class Cognon(object):
         neuron = Neuron(cfg.S0, cfg.H, cfg.G, cfg.C, cfg.D1, cfg.D2)
 
         # create the training and test wordsets
-        train_wordset = WordSet(cfg.w, cfg.S0, cfg.D1, cfg.num_active)
+        train_wordset = WordSet(cfg.w, cfg.S0, cfg.D1, cfg.num_active, cfg.R)
         test_wordset = WordSet(cfg.num_test_words, cfg.S0, cfg.D1,
-                               cfg.num_active)
+                               cfg.num_active, cfg.R)
 
         # create Alice instance to train the neuron
         alice = Alice()
